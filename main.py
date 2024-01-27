@@ -10,7 +10,6 @@ from constants import EVENTS
 from startScreen import StartScreen  
 # Background 
 from background import Background
-
 # Sprites
 from seagull import Seagull
 from man import Man
@@ -46,13 +45,13 @@ def update_game_state(actor, objects, win_size, shits, object_threshold=5):
 
     for obj in objects:
         if obj.rect.right < 0:
-                objects.remove(obj)
+                objects.remove(obj) 
 
-    for obj in shits:
-        if obj.rect.bottom < 0:
-                shits.remove(obj)
+    for shit in shits:
+        print(shits)  
+        if shit.rect.y > win_size[0]:
+                shits.remove(shit)
 
- 
 def check_collisions(actor, objects):
     hits = pygame.sprite.spritecollide(actor, objects, True)
     if hits:  # If there was a collision
@@ -79,8 +78,6 @@ def lookForPoop(actor, poops, event):
     if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
         poop = Poop(actor)  # Create a new instance of Poop
         poops.add(poop)  # Add the poop to the objects sprite group
-        print("Poop")
-        print(poops)
 
 def main(bg, win):
     ### Game loop ###
@@ -106,7 +103,7 @@ def main(bg, win):
             lookForPoop(actor, shits, event)
 
         """Update the game state"""
-        #spawnHumans(humans, bg.win_size)
+        spawnHumans(humans, bg.win_size)
         update_game_state(actor, humans, bg.win_size, shits)
         score += check_collisions(actor, humans)
 
@@ -120,7 +117,6 @@ def startScreen():
 
     if not startScreen.startScreen(): # Start Screen
         pygame.quit()
-        print("Game closed")
         exit()
     
 if __name__ == '__main__':
