@@ -1,3 +1,5 @@
+import time
+
 import pygame
 from pathlib import Path
 import random
@@ -8,6 +10,40 @@ EVENTS = {
     'COLLISION': pygame.USEREVENT,
     'TIMER': pygame.USEREVENT + 1,
 }
+
+class Poop(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = scale_img(Path('assets','bomb.jpeg'), 10)
+        self.rect = self.image.get_rect()
+        self.rect.center = (0, 0) # init pos
+        self.speed = pygame.math.Vector2(0, 0)
+        self.acceleration = pygame.math.Vector2(0, 0.1)
+        self.collided = False
+        self.spawned = False
+
+    def dispawn(self,win_size):
+        if not self.spawned or (self.rect.bottom < win_size[1]):
+            self.remove()
+
+    def collide(self):
+        if not self.collided:
+            self.collided = True
+            pygame.time.set_timer(EVENTS['COLLISION'], 500)  # Start a timer for 0.5 seconds
+            self.spawned = False
+
+    def update(self, win_size):
+        self.speed += self.acceleration
+        self.rect.move_ip(self.speed)
+        self.check_collision_event()
+
+    def check_collision_event(self):
+        for event in pygame.event.get():
+            if event.type == EVENTS['COLLISION']:
+                self.collided = False
+
+
+
 
 class Seagull(pygame.sprite.Sprite):
     def __init__(self):
@@ -171,14 +207,15 @@ def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=
         obj = Man(x_spot, y_spot, obj_type)
         objects.add(obj)
 
-def update_game_state(actor, objects, win_size, object_threshold=5):
+def update_game_state(actor, poop_obj:Poop, objects, win_size, object_threshold=5):
     actor.update(win_size)
+    poop_obj.update(win_size) # Update poop trajectory
     objects.update()
-
     # Keep the number of objects below the threshold
     if len(objects) > object_threshold:
         objects.remove(objects.sprites()[-1])
 
+    ### Dispawn poop_obj here if win_size.bottom > threshhold###
     for obj in objects:
         if obj.rect.right < 0:
                 objects.remove(obj)
@@ -189,10 +226,11 @@ def check_collisions(actor, objects):
         actor.collide()
     return len(hits)
 
-def draw_everything(win, bg, actor, score_text, objects):
+def draw_everything(win, bg, actor, poop_obj, score_text, objects):
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
     win.blit(actor.image, actor.rect)
+    win.blit(poop_obj.image, poop_obj.rect) #draw it separately from other objects
     win.blit(score_text, (10, 10))
     for obj in objects:
         win.blit(obj.image, obj.rect)
@@ -205,6 +243,7 @@ if __name__ == '__main__':
     
     ### Game objects ###
     actor = Seagull()
+    poop_obj = Poop() #init (position should be outside the screen), or somewhere else
     objects = pygame.sprite.Group()
 
     ### Game loop ###
@@ -222,14 +261,23 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                ### Check for  key pressing event ###
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    ### Set coordinates to current one of the seagull ###
+                   poop_obj.rect.centerx = actor.rect.centerx
+                   poop_obj.rect.centery = actor.rect.centery
             elif event.type == EVENTS['COLLISION']:
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
 
         spawn_objects(objects, bg.win_size)
-        update_game_state(actor, objects, bg.win_size)
+
+        ## Probably need to have "spawn_poop" here ###
+
+        update_game_state(actor, poop_obj, objects, bg.win_size)
         score += check_collisions(actor, objects)
         bg.update_position()
-        draw_everything(win, bg, actor, score_text, objects)
+        draw_everything(win, bg, actor, poop_obj, score_text, objects)
 
     pygame.quit()
