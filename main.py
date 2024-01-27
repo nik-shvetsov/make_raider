@@ -126,18 +126,21 @@ def create_button_text(font_size=36):
     button_font = pygame.font.Font(None, font_size)
     return button_font.render('Play', True, (0, 0, 0))
 
-def start_screen(win, win_size):
+def start_screen(win, win_size, theme_path:Path):
     title = create_title()
     play_button = create_play_button(win_size)
     button_text = create_button_text()
+    theme_sound = pygame.mixer.Sound(theme_path)
 
     while True:
+        theme_sound.play()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if play_button.collidepoint(event.pos):
+                    theme_sound.stop()
                     return True
 
         win.fill((0, 0, 0))
@@ -189,6 +192,13 @@ def check_collisions(actor, objects):
         actor.collide()
     return len(hits)
 
+
+def play_collision_sound(actor, sound):
+    if actor.collided:
+        sound.play()
+    else:
+        sound.stop()
+
 def draw_everything(win, bg, actor, score_text, objects):
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
@@ -202,17 +212,25 @@ if __name__ == '__main__':
     ### Assets ###
     bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
     win = pygame.display.set_mode(bg.win_size)
-    
+
+    sound_theme = Path('assets','sounds','theme_norway.mp3')
+    sound_bird_scream = Path('assets','sounds','bird_scream.mp3')
+    sound_man_scream = Path('assets','sounds', 'man_scream.mp3')
+    sound_bird_hit = Path('assets', 'sounds', 'hit.mp3')
+
+    pygame.mixer.init()
+    collision_sound = pygame.mixer.Sound(sound_bird_hit)
+
     ### Game objects ###
     actor = Seagull()
     objects = pygame.sprite.Group()
 
     ### Game loop ###
     running = True
-    score = 0 
+    score = 0
     pygame.init()
     font = pygame.font.Font(None, 36)
-    if not start_screen(win, bg.win_size):
+    if not start_screen(win, bg.win_size, sound_theme):
         pygame.quit()
         exit()
 
@@ -223,8 +241,10 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == EVENTS['COLLISION']:
+                play_collision_sound(actor,collision_sound)
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
+
 
         spawn_objects(objects, bg.win_size)
         update_game_state(actor, objects, bg.win_size)
