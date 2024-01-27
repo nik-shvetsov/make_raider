@@ -1,49 +1,19 @@
 import pygame
 from pathlib import Path
 import random
+
+# Utils
 from utils import scale_img
+ # Constants
+from constants import EVENTS
+# Menue Screen
+from startScreen import StartScreen  
+# Background 
+from background import Background
 
-ENV_SPEED = 2
-EVENTS = {
-    'COLLISION': pygame.USEREVENT,
-    'TIMER': pygame.USEREVENT + 1,
-}
-
-def create_title(font_size=50):
-    title_font = pygame.font.Font(None, font_size)
-    return title_font.render('Måke raider', True, (255, 255, 255))
-
-def create_play_button(win_size):
-    return pygame.Rect(win_size[0] / 2 - 50, win_size[1] / 2, 100, 50)
-
-def create_button_text(font_size=36):
-    button_font = pygame.font.Font(None, font_size)
-    return button_font.render('Play', True, (0, 0, 0))
-
-def start_screen(win, win_size):
-    title = create_title()
-    play_button = create_play_button(win_size)
-    button_text = create_button_text()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if play_button.collidepoint(event.pos):
-                    return True
-
-        win.fill((0, 0, 0))
-        win.blit(title, (win_size[0] / 2 - title.get_width() / 2, win_size[1] / 4))
-        pygame.draw.rect(win, (0, 255, 0), play_button)
-        win.blit(button_text, (play_button.x + play_button.width / 2 - button_text.get_width() / 2, play_button.y + play_button.height / 2 - button_text.get_height() / 2))
-        pygame.display.flip()
-
-# def spawn_objects(objects, win_size, x_offset=100, y_position=640):
-#     if random.uniform(0, 1) < 0.1: # 10% chance per frame
-#         obj = Man(win_size[0] + x_offset, y_position)
-#         objects.add(obj)
+# Sprites
+from seagull import Seagull
+from man import Man
 
 def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
     if random.uniform(0, 1) < 0.05:  # 5% chance per frame
@@ -76,7 +46,7 @@ def update_game_state(actor, objects, win_size, object_threshold=5):
     for obj in objects:
         if obj.rect.right < 0:
                 objects.remove(obj)
-
+ 
 def check_collisions(actor, objects):
     hits = pygame.sprite.spritecollide(actor, objects, True)
     if hits:  # If there was a collision
@@ -92,23 +62,26 @@ def draw_everything(win, bg, actor, score_text, objects): # Render Evrthing on s
         win.blit(obj.image, obj.rect)
     pygame.display.flip()
 
-
 if __name__ == '__main__':
     ### Assets ###
     bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
+    print(bg.win_size)  
     win = pygame.display.set_mode(bg.win_size)
     
     ### Game objects ###
-    actor = Seagull()
     objects = pygame.sprite.Group()
+    actor = Seagull(objects)
 
     ### Game loop ###
     running = True
     score = 0 
     pygame.init()
     font = pygame.font.Font(None, 36)
-    if not start_screen(win, bg.win_size):
+
+    startScreen = StartScreen(win, bg.win_size)
+    if not startScreen.startScreen(): # Start Screen
         pygame.quit()
+        print("Game closed")
         exit()
 
     while running:

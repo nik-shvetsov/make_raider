@@ -1,6 +1,5 @@
 import pygame
 from pathlib import Path
-import random
 from utils import scale_img
 
 ENV_SPEED = 2

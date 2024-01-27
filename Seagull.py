@@ -1,16 +1,13 @@
 import pygame
 from pathlib import Path
-import random
-from utils import scale_img
 
-ENV_SPEED = 2
-EVENTS = {
-    'COLLISION': pygame.USEREVENT,
-    'TIMER': pygame.USEREVENT + 1,
-}
+from utils import scale_img
+from poop import Poop
+
+from constants import ENV_SPEED, EVENTS
 
 class Seagull(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, objectsOnScreen):
         super().__init__()
         self.states_imgs = self.load_images()
         self.image = self.states_imgs['normal']
@@ -19,6 +16,8 @@ class Seagull(pygame.sprite.Sprite):
         self.speed = pygame.math.Vector2(0, 0)
         self.acceleration = pygame.math.Vector2(0, 0.1)
         self.collided = False
+
+        self.objectsOnScreen = objectsOnScreen  
 
     def load_images(self):
         return {
@@ -33,13 +32,13 @@ class Seagull(pygame.sprite.Sprite):
             pygame.time.set_timer(EVENTS['COLLISION'], 500)  # Start a timer for 0.5 seconds
 
     def update(self, win_size):
-        self.update_speed()
+        self.verifyControlls()
         self.speed += self.acceleration
         self.rect.move_ip(self.speed)
         self.restrict_movement(win_size)
         self.check_collision_event()
 
-    def update_speed(self): 
+    def verifyControlls(self): 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.speed.x = -ENV_SPEED
@@ -56,7 +55,7 @@ class Seagull(pygame.sprite.Sprite):
 
     def poop(self):
         poop = Poop(self)  # Create a new instance of Poop
-        objects.add(poop)  # Add the poop to the objects sprite group
+        self.objectsOnScreen.add(poop)  # Add the poop to the objects sprite group
 
     
     def restrict_movement(self, win_size):

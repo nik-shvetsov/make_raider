@@ -1,13 +1,10 @@
 import pygame
-from pathlib import Path
 import random
+from pathlib import Path
 from utils import scale_img
+# Constants
+from constants import ENV_SPEED
 
-ENV_SPEED = 2
-EVENTS = {
-    'COLLISION': pygame.USEREVENT,
-    'TIMER': pygame.USEREVENT + 1,
-}
 
 class Man(pygame.sprite.Sprite):
     def __init__(self, x, y, mtype=None):
