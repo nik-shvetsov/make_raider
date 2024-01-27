@@ -22,15 +22,10 @@ class Poop(pygame.sprite.Sprite):
         self.collided = False
         self.spawned = False
 
-    def dispawn(self,win_size):
-        if not self.spawned or (self.rect.bottom < win_size[1]):
-            self.remove()
-
     def collide(self):
         if not self.collided:
             self.collided = True
             pygame.time.set_timer(EVENTS['COLLISION'], 500)  # Start a timer for 0.5 seconds
-            self.spawned = False
 
     def update(self, win_size):
         self.speed += self.acceleration
@@ -215,6 +210,9 @@ def update_game_state(actor, poop_obj:Poop, objects, win_size, object_threshold=
     if len(objects) > object_threshold:
         objects.remove(objects.sprites()[-1])
 
+    # if poop_obj.collided or poop_obj.rect.bottom < win_size[1]:
+    #     poop_obj.spawned = False
+    # Similarly to objects have a list for poop_obj ? Remove from the list when dispawn and respawn by the pressing of the button
     ### Dispawn poop_obj here if win_size.bottom > threshhold###
     for obj in objects:
         if obj.rect.right < 0:
@@ -267,6 +265,9 @@ if __name__ == '__main__':
                     ### Set coordinates to current one of the seagull ###
                    poop_obj.rect.centerx = actor.rect.centerx
                    poop_obj.rect.centery = actor.rect.centery
+                   poop_obj.speed = pygame.math.Vector2(0, 0)
+                   poop_obj.acceleration = pygame.math.Vector2(0, 0.1)
+                   ### Re-initialize speed, vector need an adjustment ###
             elif event.type == EVENTS['COLLISION']:
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
