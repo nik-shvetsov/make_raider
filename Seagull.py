@@ -7,7 +7,7 @@ from poop import Poop
 from constants import ENV_SPEED, EVENTS
 
 class Seagull(pygame.sprite.Sprite):
-    def __init__(self, objectsOnScreen):
+    def __init__(self):
         super().__init__()
         self.states_imgs = self.load_images()
         self.image = self.states_imgs['normal']
@@ -17,7 +17,6 @@ class Seagull(pygame.sprite.Sprite):
         self.acceleration = pygame.math.Vector2(0, 0.1)
         self.collided = False
 
-        self.objectsOnScreen = objectsOnScreen  
 
     def load_images(self):
         return {
@@ -46,18 +45,9 @@ class Seagull(pygame.sprite.Sprite):
             self.speed.x = ENV_SPEED
         else:
             self.speed.x = 0
-
         if keys[pygame.K_UP]:
             self.speed.y = -5
 
-        if keys[pygame.K_SPACE]:  # Check if the space key is pressed
-            self.poop()  # Call the poop method
-
-    def poop(self):
-        poop = Poop(self)  # Create a new instance of Poop
-        self.objectsOnScreen.add(poop)  # Add the poop to the objects sprite group
-
-    
     def restrict_movement(self, win_size):
         if self.rect.bottom > win_size[1]: 
             self.rect.bottom = win_size[1]
