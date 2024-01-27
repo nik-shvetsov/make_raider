@@ -18,9 +18,9 @@ class Man(pygame.sprite.Sprite):
 
     def load_images(self):
         return {
-            'man1': scale_img(Path('assets', 'obj_man_1.png'), 100),
-            'man2': scale_img(Path('assets', 'obj_man_2.png'), 100),
-            'man3': scale_img(Path('assets', 'obj_man_3.png'), 100),
+            'man1': scale_img(Path('pics', 'dog1.png'), 100),
+            'man2': scale_img(Path('pics', 'girl1.png'), 100),
+            'man3': scale_img(Path('pics', 'cat1.png'), 100),
         }
 
     def update(self, speed=ENV_SPEED):

@@ -21,7 +21,7 @@ class Seagull(pygame.sprite.Sprite):
 
     def load_images(self):
         return {
-            'normal': scale_img(Path('assets', 'seagull_normal_fly.png'), 150),
+            'normal': scale_img(Path('pics', 'seagull.png'), 150),
             'collide': scale_img(Path('assets', 'seagull_quack.png'), 150),
         }
 

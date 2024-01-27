@@ -53,6 +53,12 @@ def check_collisions(actor, objects):
         actor.collide()
     return len(hits)
 
+def play_collision_sound(actor, sound):
+    if actor.collided:
+        sound.play()
+    else:
+        sound.stop()
+
 def draw_everything(win, bg, actor, score_text, objects): # Render Evrthing on screen
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
@@ -64,9 +70,19 @@ def draw_everything(win, bg, actor, score_text, objects): # Render Evrthing on s
 
 if __name__ == '__main__':
     ### Assets ###
+    # bg = Background(Path('pics', 'houses_l.png'), Path('pics', 'houses_r.png'))
     bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
-    print(bg.win_size)  
-    win = pygame.display.set_mode(bg.win_size)
+    win_size = (1000, 1000)
+    win = pygame.display.set_mode(win_size)
+
+    sound_theme = Path('assets','sounds','theme_norway.mp3')
+    sound_bird_scream = Path('assets','sounds','bird_scream.mp3')
+    sound_man_scream = Path('assets','sounds', 'man_scream.mp3')
+    sound_bird_hit = Path('assets', 'sounds', 'hit.mp3')
+
+    pygame.mixer.init()
+    collision_sound = pygame.mixer.Sound(str(sound_bird_hit))
+
     
     ### Game objects ###
     objects = pygame.sprite.Group()
@@ -78,7 +94,7 @@ if __name__ == '__main__':
     pygame.init()
     font = pygame.font.Font(None, 36)
 
-    startScreen = StartScreen(win, bg.win_size)
+    startScreen = StartScreen(win, win_size, sound_theme)
     if not startScreen.startScreen(): # Start Screen
         pygame.quit()
         print("Game closed")
@@ -94,8 +110,8 @@ if __name__ == '__main__':
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
         
-        spawn_objects(objects, bg.win_size)
-        update_game_state(actor, objects, bg.win_size)
+        spawn_objects(objects, win_size)
+        update_game_state(actor, objects, win_size)
         score += check_collisions(actor, objects)
         bg.update_position()
         draw_everything(win, bg, actor, score_text, objects)

@@ -1,13 +1,14 @@
 import pygame
 
 class StartScreen:
-    def __init__(self,window, window_size):
+    def __init__(self, window, window_size, theme_path):
         self.window = window
         self.window_size = window_size 
 
         self.title = self.create_title()
         self.button_text = self.create_button_text()
         self.play_button = self.create_play_button()
+        self.theme_sound = pygame.mixer.Sound(theme_path)
         
     def create_button_text(self, font_size=36):
         button_font = pygame.font.Font(None, font_size)
@@ -31,12 +32,14 @@ class StartScreen:
 
     def startScreen(self):
         while True:
+            self.theme_sound.play()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if self.play_button.collidepoint(event.pos):
+                        self.theme_sound.stop()
                         return True
             
             self.draw();
