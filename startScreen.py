@@ -22,7 +22,7 @@ class StartScreen:
         title_font = pygame.font.Font(None, font_size)
         return title_font.render('Måke raider', True, (255, 255, 255))
     
-    def draw (self):
+    def draw(self):
         window = self.window
         window.fill((0, 0, 0))
         window.blit(self.title, (self.window_size[0] / 2 - self.title.get_width() / 2, self.window_size[1] / 4))

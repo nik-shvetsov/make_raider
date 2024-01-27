@@ -10,12 +10,12 @@ from constants import EVENTS
 from startScreen import StartScreen  
 # Background 
 from background import Background
-
 # Sprites
 from seagull import Seagull
 from man import Man
+from poop import Poop
 
-def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
+def spawnHumans(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
     if random.uniform(0, 1) < 0.05:  # 5% chance per frame
         allowed_spots = Man.get_allowed_spots()
         obj_type = random.choice(list(allowed_spots.keys()))
@@ -35,85 +35,106 @@ def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=
         obj = Man(x_spot, y_spot, obj_type)
         objects.add(obj)
 
-def update_game_state(actor, objects, win_size, object_threshold=5):
+def update_game_state(actor, objects, win_size, shits, object_threshold=5):
     actor.update(win_size)
     objects.update()
-
+    shits.update()
     # Keep the number of objects below the threshold
     if len(objects) > object_threshold:
         objects.remove(objects.sprites()[-1])
 
     for obj in objects:
         if obj.rect.right < 0:
-                objects.remove(obj)
- 
-def check_collisions(actor, objects):
-    hits = pygame.sprite.spritecollide(actor, objects, True)
-    if hits:  # If there was a collision
-        actor.collide()
-    return len(hits)
+                objects.remove(obj) 
 
-def play_collision_sound(actor, sound):
+    for shit in shits:
+        print(shits)  
+        if shit.rect.y > win_size[0]:
+                shits.remove(shit)
+
+def play_collision_sound(actor):
+    sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
     if actor.collided:
         sound.play()
     else:
         sound.stop()
 
-def draw_everything(win, bg, actor, score_text, objects): # Render Evrthing on screen
+def check_collisions(actor, objects):
+    hits = pygame.sprite.spritecollide(actor, objects, True)
+    if hits:  # If there was a collision
+        actor.collide()
+        
+    play_collision_sound(actor)
+    return len(hits)
+
+def draw_everything(win, bg, actor, score_text, objects,shits): # Render Evrthing on screen
+    """Draw everything on the screen"""
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
     win.blit(actor.image, actor.rect)
     win.blit(score_text, (10, 100))
+
+    """Draw all the objects"""
     for obj in objects:
         win.blit(obj.image, obj.rect)
+
+    for pop in shits:
+        win.blit(pop.image, pop.rect)
+
     pygame.display.flip()
 
-if __name__ == '__main__':
-    ### Assets ###
-    # bg = Background(Path('pics', 'houses_l.png'), Path('pics', 'houses_r.png'))
-    bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
-    win_size = (1000, 1000)
-    win = pygame.display.set_mode(win_size)
+def lookForPoop(actor, poops, event):
+    if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+        poop = Poop(actor)  # Create a new instance of Poop
+        poops.add(poop)  # Add the poop to the objects sprite group
 
+def startScreen():
     sound_theme = Path('assets','sounds','theme_norway.mp3')
-    sound_bird_scream = Path('assets','sounds','bird_scream.mp3')
-    sound_man_scream = Path('assets','sounds', 'man_scream.mp3')
-    sound_bird_hit = Path('assets', 'sounds', 'hit.mp3')
+    startScreen = StartScreen(win, bg.win_size, sound_theme)
+    if not startScreen.startScreen(): # Start Screen
+        pygame.quit()
+        exit()
 
-    pygame.mixer.init()
-    collision_sound = pygame.mixer.Sound(str(sound_bird_hit))
-
-    
-    ### Game objects ###
-    objects = pygame.sprite.Group()
-    actor = Seagull(objects)
-
+def main(bg, win):
     ### Game loop ###
     running = True
     score = 0 
-    pygame.init()
+
+    ### Game objects ###
+    humans = pygame.sprite.Group()
+    actor = Seagull()
+    shits = pygame.sprite.Group()
+
     font = pygame.font.Font(None, 36)
-
-    startScreen = StartScreen(win, win_size, sound_theme)
-    if not startScreen.startScreen(): # Start Screen
-        pygame.quit()
-        print("Game closed")
-        exit()
-
     while running:
-        score_text = font.render('Score: ' + str(score), True, (255, 255, 255))
-        
+        score_text = font.render('Score: ' + str(score), True, (255, 255, 255))   
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == EVENTS['COLLISION']:
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
-        
-        spawn_objects(objects, win_size)
-        update_game_state(actor, objects, win_size)
-        score += check_collisions(actor, objects)
+            
+            lookForPoop(actor, shits, event)
+
+        """Update the game state"""
+        spawnHumans(humans, bg.win_size)
+        update_game_state(actor, humans, bg.win_size, shits)
+        score += check_collisions(actor, humans)
+
+        draw_everything(win, bg, actor, score_text, humans, shits)
         bg.update_position()
-        draw_everything(win, bg, actor, score_text, objects)
 
     pygame.quit()
+ 
+if __name__ == '__main__':
+    ### Setup ###
+    bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
+    win = pygame.display.set_mode(bg.win_size)
+    pygame.init()
+
+
+    ## Game Start ##
+    startScreen()
+    main(bg, win)
