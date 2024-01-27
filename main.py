@@ -9,112 +9,6 @@ EVENTS = {
     'TIMER': pygame.USEREVENT + 1,
 }
 
-class Seagull(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.states_imgs = self.load_images()
-        self.image = self.states_imgs['normal']
-        self.rect = self.image.get_rect()
-        self.rect.center = (400, 300) # init pos
-        self.speed = pygame.math.Vector2(0, 0)
-        self.acceleration = pygame.math.Vector2(0, 0.1)
-        self.collided = False
-
-    def load_images(self):
-        return {
-            'normal': scale_img(Path('assets', 'seagull_normal_fly.png'), 150),
-            'collide': scale_img(Path('assets', 'seagull_quack.png'), 150),
-        }
-
-    def collide(self):
-        if not self.collided:
-            self.image = self.states_imgs['collide']
-            self.collided = True
-            pygame.time.set_timer(EVENTS['COLLISION'], 500)  # Start a timer for 0.5 seconds
-
-    def update(self, win_size):
-        self.update_speed()
-        self.speed += self.acceleration
-        self.rect.move_ip(self.speed)
-        self.restrict_movement(win_size)
-        self.check_collision_event()
-
-    def update_speed(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.speed.x = -ENV_SPEED
-        elif keys[pygame.K_RIGHT]:
-            self.speed.x = ENV_SPEED
-        else:
-            self.speed.x = 0
-
-        if keys[pygame.K_UP]:
-            self.speed.y = -5
-
-    def restrict_movement(self, win_size):
-        if self.rect.bottom > win_size[1]: 
-            self.rect.bottom = win_size[1]
-        if self.rect.top < 0:
-            self.rect.top = 0
-        if self.rect.left < 0:
-            self.rect.left = 0
-        if self.rect.right > win_size[0]:
-            self.rect.right = win_size[0]
-
-    def check_collision_event(self):
-        for event in pygame.event.get():
-            if event.type == EVENTS['COLLISION']:
-                self.image = self.states_imgs['normal']
-                self.collided = False
-
-class Man(pygame.sprite.Sprite):
-    def __init__(self, x, y, mtype=None):
-        super().__init__()
-        self.man_types = self.load_images()
-        if mtype is not None:
-            self.image = self.man_types[mtype]
-        else:
-            self.image = self.man_types[random.choice(list(self.man_types.keys()))]
-        self.rect = self.image.get_rect(center=(x, y))
-
-    def load_images(self):
-        return {
-            'man1': scale_img(Path('assets', 'obj_man_1.png'), 100),
-            'man2': scale_img(Path('assets', 'obj_man_2.png'), 100),
-            'man3': scale_img(Path('assets', 'obj_man_3.png'), 100),
-        }
-
-    def update(self, speed=ENV_SPEED):
-        self.rect.move_ip(-speed, 0)  # Move objects to the left
-    
-    @classmethod
-    def get_allowed_spots(cls):
-        return {
-            'man1': None,
-            'man2': None,
-            'man3': [(300, 200), (400, 200), (500, 200)],
-        }
-
-class Background():
-    def __init__(self, left_path, right_path):
-        super().__init__()
-        self.left_img = pygame.image.load(left_path)
-        self.right_img = pygame.image.load(right_path)
-        assert self.left_img.get_size() == self.right_img.get_size(), 'Background images must be the same size'
-        self.win_size = self.left_img.get_size()
-
-        self.left_img_pos = 0
-        self.right_img_pos = self.right_img.get_width()
-
-    def update_position(self):
-        self.left_img_pos -= 1
-        self.right_img_pos -= 1
-        # If one background image goes off screen, reset its position to the right
-        if self.left_img_pos < -self.left_img.get_width():
-            self.left_img_pos = self.right_img.get_width()
-        if self.right_img_pos < -self.right_img.get_width():
-            self.right_img_pos = self.left_img.get_width()
-
 def create_title(font_size=50):
     title_font = pygame.font.Font(None, font_size)
     return title_font.render('Måke raider', True, (255, 255, 255))
@@ -151,7 +45,7 @@ def start_screen(win, win_size):
 #         obj = Man(win_size[0] + x_offset, y_position)
 #         objects.add(obj)
 
-def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300):
+def spawn_objects(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
     if random.uniform(0, 1) < 0.05:  # 5% chance per frame
         allowed_spots = Man.get_allowed_spots()
         obj_type = random.choice(list(allowed_spots.keys()))
@@ -189,14 +83,15 @@ def check_collisions(actor, objects):
         actor.collide()
     return len(hits)
 
-def draw_everything(win, bg, actor, score_text, objects):
+def draw_everything(win, bg, actor, score_text, objects): # Render Evrthing on screen
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
     win.blit(actor.image, actor.rect)
-    win.blit(score_text, (10, 10))
+    win.blit(score_text, (10, 100))
     for obj in objects:
         win.blit(obj.image, obj.rect)
     pygame.display.flip()
+
 
 if __name__ == '__main__':
     ### Assets ###
@@ -225,7 +120,7 @@ if __name__ == '__main__':
             elif event.type == EVENTS['COLLISION']:
                 actor.image = actor.states_imgs['normal']
                 actor.collided = False
-
+        
         spawn_objects(objects, bg.win_size)
         update_game_state(actor, objects, bg.win_size)
         score += check_collisions(actor, objects)
