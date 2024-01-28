@@ -109,9 +109,11 @@ def draw_everything(gstate):
 
     pygame.display.flip()
 
-def add_shit_object(gstate, event, shit_cost=1):
+def add_shit_object(gstate, event, shit_sound, shit_cost=1):
     if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
         if gstate['hotdog_count'] >= shit_cost:
+            shit_sound.stop()
+            shit_sound.play()
             poop = Poop(gstate['actor'])  # Create a new instance of Poop
             gstate['shits'].add(poop)  # Add the poop to the objects sprite group
             gstate['hotdog_count'] -= shit_cost
@@ -131,6 +133,10 @@ def main(gstate):
     gstate['score_img'] = scale_img(Path('assets', 'imgs', 'score.png'), 100)
     gstate['hotdog_img'] = scale_img(Path('assets', 'imgs', 'hotdogscore.png'), 100)
     # Path('assets','fonts', 'Honk', 'honk.ttf')
+
+    ### Init sounds here ###
+    fire_sound = pygame.mixer.Sound(Path('assets', 'sounds', 'fire.mp3'))
+
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
         gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))  
@@ -142,7 +148,7 @@ def main(gstate):
                 gstate['actor'].image = gstate['actor'].states_imgs['normal']
                 gstate['actor'].collided = False
             
-            add_shit_object(gstate, event)
+            add_shit_object(gstate, event, shit_sound=fire_sound)
 
         """Update the game state"""
         spawn_enemies(gstate)
