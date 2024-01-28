@@ -15,20 +15,24 @@ from seagull import Seagull
 from enemy import Enemy
 from poop import Poop
 
-def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300):
-    if random.uniform(0, 1) < 0.05:  # 5% chance per frame
-        allowed_spots = Enemy.get_allowed_spots()
-        obj_type = random.choice(list(allowed_spots.keys()))
-        spots = allowed_spots.get(obj_type, None)
-        if spots is None:  # If the spot is None, choose a random spot
+def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_range_threshold=(100, 500)):
+    if random.uniform(0, 1) < spawn_chance:  # 5% chance per frame
+        obj_type = random.choice(list(Enemy.get_allowed_xy().keys()))
+        allowed_xy = Enemy.get_allowed_xy().get(obj_type, None)
+        if allowed_xy is None:  # If the spot is None, choose a random spot
             x_spot = random.randint(gstate['win_size'][0] + x_offset, gstate['win_size'][0] + x_offset + gstate['win_size'][0])
             y_spot = y_position
         else:
-            spot = random.choice(spots)
-            x_spot, y_spot = spot[0] + gstate['win_size'][0] + x_offset, spot[1]
+            if allowed_xy[0] is None:
+                x_spot = random.randint(gstate['win_size'][0] + x_offset, gstate['win_size'][0] + x_offset + gstate['win_size'][0])
+            else:
+                x_spot = allowed_xy[0]
+            y_spot = allowed_xy[1]
         
         # Check if the new object's position would overlap with an existing object
+        dist_threshold = random.randint(*dist_range_threshold)
         for obj in gstate['objects']:
+            
             if abs(x_spot - obj.rect.centerx) < dist_threshold:  # If the distance is less than 200
                 return  # Don't spawn a new object
 
