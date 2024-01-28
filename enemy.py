@@ -10,6 +10,7 @@ class Enemy(pygame.sprite.Sprite):
         self.state_imgs = self.load_images(self.e_type)
         self.image = self.state_imgs['default']
         self.rect = self.image.get_rect(center=(x, y))
+        self.collided = False
 
         self.actions_speed = {
             'stand': -1,

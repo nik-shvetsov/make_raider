@@ -40,7 +40,7 @@ def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_
         gstate['objects'].add(obj)
 
 # def update_game_state(actor, objects, win_size, shits, object_threshold=5):
-def update_game_state(gstate, object_threshold=5):
+def update_game_state(gstate, object_threshold=8):
     gstate['actor'].update(gstate['win_size'])
     gstate['objects'].update()
     gstate['shits'].update()
@@ -65,19 +65,26 @@ def update_game_state(gstate, object_threshold=5):
             gstate['shits'].remove(poop)
     
 
-def play_collision_sound(gstate):
+def play_bounty_sound(gstate):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
     if gstate['actor'].collided:
         sound.play()
     else:
         sound.stop()
 
-def check_collisions(gstate):
-    hits = pygame.sprite.spritecollide(gstate['actor'], gstate['objects'], True)
-    if hits:  # If there was a collision
+def check_collisions_bounty(gstate):
+    # hits = pygame.sprite.spritecollide(gstate['actor'], gstate['objects'], True)
+    hits = [obj for obj in gstate['objects'] if (
+        isinstance(obj, Enemy) and 
+        not obj.collided and
+        (obj.e_type == 'blond_girl' or obj.e_type == 'red_girl' or obj.e_type == 'can') and 
+        pygame.sprite.collide_rect(gstate['actor'], obj)
+    )]
+    for hit in hits:
+        hit.collided = True
         gstate['actor'].collide()
         
-    play_collision_sound(gstate)
+    play_bounty_sound(gstate)
     return len(hits)
 
 # def draw_everything(win, bg, actor, score_text, objects,shits):
@@ -86,8 +93,12 @@ def draw_everything(gstate):
     gstate['win'].blit(gstate['bg'].left_img, (gstate['bg'].left_img_pos, 0))
     gstate['win'].blit(gstate['bg'].right_img, (gstate['bg'].right_img_pos, 0))
     gstate['win'].blit(gstate['actor'].image, gstate['actor'].rect)
-    gstate['win'].blit(gstate['score_img'], (10, 10))
-    gstate['win'].blit(gstate['score_text'], (gstate['score_img'].get_rect().right + 20, gstate['score_img'].get_rect().centery))
+
+    gstate['win'].blit(gstate['score_img'], (10, 20))
+    gstate['win'].blit(gstate['score_text'], (gstate['score_img'].get_rect().right + 20, gstate['score_img'].get_rect().centery + 10))
+
+    gstate['win'].blit(gstate['hotdog_img'], (10, 80))
+    gstate['win'].blit(gstate['hotdog_text'], (gstate['hotdog_img'].get_rect().right, gstate['hotdog_img'].get_rect().centery + 55))
 
     """Draw all the objects"""
     for obj in gstate['objects']:
@@ -100,10 +111,10 @@ def draw_everything(gstate):
 
 def add_shit_object(gstate, event, shit_cost=1):
     if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-        if gstate['score'] >= shit_cost:
+        if gstate['hotdog_count'] >= shit_cost:
             poop = Poop(gstate['actor'])  # Create a new instance of Poop
             gstate['shits'].add(poop)  # Add the poop to the objects sprite group
-            gstate['score'] -= shit_cost
+            gstate['hotdog_count'] -= shit_cost
 
 def init_start_screen(gstate, sound_path):
     start_screen = StartScreen(gstate['win'], gstate['win_size'], sound_path)
@@ -118,10 +129,11 @@ def main(gstate):
     gstate['objects'] = pygame.sprite.Group()
     gstate['shits'] = pygame.sprite.Group()
     gstate['score_img'] = scale_img(Path('assets', 'imgs', 'score.png'), 100)
+    gstate['hotdog_img'] = scale_img(Path('assets', 'imgs', 'hotdogscore.png'), 100)
     # Path('assets','fonts', 'Honk', 'honk.ttf')
-    font = pygame.font.Font(None, 36)
     while running:
-        gstate['score_text'] = font.render(str(gstate['score']), True, (255,0,0))   
+        gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
+        gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))  
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,7 +147,7 @@ def main(gstate):
         """Update the game state"""
         spawn_enemies(gstate)
         update_game_state(gstate)
-        gstate['score'] += check_collisions(gstate)
+        gstate['hotdog_count'] += check_collisions_bounty(gstate)
 
         draw_everything(gstate)
         gstate['bg'].update_position()
@@ -149,7 +161,8 @@ if __name__ == '__main__':
         'objects': [],
         'actor': None,
         'shits': [],
-        'score': 5
+        'score': 0,
+        'hotdog_count': 0
     }
 
     gstate['bg'] = Background(Path('assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)
