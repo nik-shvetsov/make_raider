@@ -25,10 +25,10 @@ class Seagull(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (400, 300) # init pos
         self.speed = pygame.math.Vector2(0, 0)
-        self.acceleration = pygame.math.Vector2(0, 0.1)
+        self.acceleration = pygame.math.Vector2(0, 0.015)
         self.collided = False
-        self.x_controlled_speed = 2
-        self.y_controlled_speed = 5
+        self.x_controlled_speed = 1.2
+        self.y_controlled_speed = 1.1
 
         # # Scale bbox
         # self.rect.width *= 0.5
@@ -57,9 +57,9 @@ class Seagull(pygame.sprite.Sprite):
 
         self.speed += self.acceleration
         if not self.collided:
-            if self.speed.y > 3:
+            if self.speed.y > 0.5:
                 self.switch_state('dive')
-            if self.speed.y < -3:
+            if self.speed.y < -0.3:
                 self.switch_state('normal')
 
         self.rect.move_ip(self.speed)
