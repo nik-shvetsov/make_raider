@@ -15,7 +15,7 @@ from seagull import Seagull
 from enemy import Enemy
 from poop import Poop
 
-def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_range_threshold=(100, 500)):
+def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_range_threshold=(120, 400)):
     if random.uniform(0, 1) < spawn_chance:  # 5% chance per frame
         obj_type = random.choice(list(Enemy.get_allowed_xy().keys()))
         allowed_xy = Enemy.get_allowed_xy().get(obj_type, None)
@@ -67,8 +67,15 @@ def update_game_state(gstate, object_threshold=8):
     
     for obj in gstate['objects']:
         if (obj.e_type == 'outcat' or obj.e_type == 'dog') and pygame.sprite.collide_rect(gstate['actor'], obj):
-            # TODO: remove actor 
             obj.switch_state('actor_collide')
+            
+            if obj.e_type == 'outcat':
+                gstate['actor'].switch_state('collide')
+
+            if obj.e_type == 'dog':
+                gstate['actor'].image.set_alpha(0)
+                obj.rect.y -= 150
+
             gstate['game_over'] = True
 
     if gstate['actor'].rect.bottom > gstate['win_size'][1] * 1.06:
@@ -149,10 +156,10 @@ def init_start_screen(gstate, sound_path):
 def show_game_over_screen(gstate):
     game_over_img = pygame.image.load(Path('assets', 'imgs', 'game_over.png'))
     score_text = pygame.font.Font(None, 200).render(f"{gstate['score']}", True, (255, 0, 0))
-    gstate['win'].blit(game_over_img, (0, 0))  # Draw the game over image
+    gstate['win'].blit(game_over_img, (0, -gstate['win_size'][1]/4))  # Draw the game over image
     gstate['win'].blit(score_text, (
         gstate['win_size'][0] * 0.7,
-        gstate['win_size'][1] * 0.6
+        gstate['win_size'][1] * 0.35
     ))
     pygame.display.flip()  # Update the display
 
@@ -174,8 +181,6 @@ def main(gstate):
 
     ### Init sounds here ###
     fire_sound = pygame.mixer.Sound(Path('assets', 'sounds', 'fire.mp3'))
-    bird_hitted_sound = pygame.mixer.Sound(Path('assets','sounds', 'bird_scream.mp3'))
-    dog_sound = None
 
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))

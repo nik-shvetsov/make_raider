@@ -7,6 +7,7 @@ class StartScreen:
         self.window = window
         self.window_size = window_size 
         self.bg_image = pygame.image.load(Path('assets', 'imgs', 'loadscreen.png'))
+        self.description_img = scale_img(Path('assets', 'imgs', 'desc.png'), d_height=200)
         self.play_button_img = scale_img(Path('assets', 'imgs', 'start_btn.png'), d_height=100)
         self.play_button = self.create_play_button()
         self.theme_sound = pygame.mixer.Sound(theme_path)
@@ -24,6 +25,11 @@ class StartScreen:
     def draw(self):
         window = self.window
         window.blit(self.bg_image, (0, 0))  # draw the background image
+        window.blit(self.description_img, 
+            (
+                self.window_size[0] - (self.description_img.get_size()[0] + 20),
+                self.window_size[1] - (self.description_img.get_size()[1] + 20)
+            ))  # draw the description image
         window.blit(self.play_button_img, (self.play_button.x, self.play_button.y)) 
 
     def run(self):
