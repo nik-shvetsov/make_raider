@@ -33,7 +33,7 @@ class Seagull(pygame.sprite.Sprite):
         if not self.collided:
             self.image = self.states_imgs['collide']
             self.collided = True
-            pygame.time.set_timer(EVENTS['COLLISION'], 500)  # Start a timer for 0.5 seconds
+            pygame.time.set_timer(EVENTS['ACTOR_COLLISION'], 500)  # Start a timer for 0.5 seconds
 
     def update(self, win_size):
         self.check_controls()
@@ -75,6 +75,6 @@ class Seagull(pygame.sprite.Sprite):
 
     def check_collision_event(self):
         for event in pygame.event.get():
-            if event.type == EVENTS['COLLISION']:
+            if event.type == EVENTS['ACTOR_COLLISION']:
                 self.image = self.states_imgs['normal']
                 self.collided = False

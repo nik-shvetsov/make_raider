@@ -5,7 +5,8 @@ class Background():
     def __init__(self, img_path, d_height, init_speed=1):
         super().__init__()
         self.left_img = scale_img(img_path, d_height=d_height)
-        self.right_img = pygame.transform.flip(self.left_img, True, False)
+        # self.right_img = pygame.transform.flip(self.left_img, True, False)
+        self.right_img = self.left_img
         self.win_size = self.left_img.get_size()
         self.left_img_pos = 0
         self.right_img_pos = self.right_img.get_width()

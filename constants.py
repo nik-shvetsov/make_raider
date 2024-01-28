@@ -1,6 +1,6 @@
 import pygame
 
 EVENTS = {
-    'COLLISION': pygame.USEREVENT,
+    'ACTOR_COLLISION': pygame.USEREVENT,
     'TIMER': pygame.USEREVENT + 1,
 }

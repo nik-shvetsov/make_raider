@@ -52,6 +52,15 @@ def update_game_state(gstate, object_threshold=5):
         if shit.rect.y > gstate['win_size'][0]:
             gstate['shits'].remove(shit)
 
+    for poop in gstate['shits']:
+        enemies_hit = pygame.sprite.spritecollide(poop, gstate['objects'], False)
+        for enemy in enemies_hit:
+            # Handle collision: add score, change state, remove poop
+            gstate['score'] += 5
+            enemy.switch_state('poop_collide')
+            gstate['shits'].remove(poop)
+    
+
 def play_collision_sound(gstate):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
     if gstate['actor'].collided:
@@ -112,7 +121,7 @@ def main(gstate):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == EVENTS['COLLISION']:
+            elif event.type == EVENTS['ACTOR_COLLISION']:
                 gstate['actor'].image = gstate['actor'].states_imgs['normal']
                 gstate['actor'].collided = False
             
