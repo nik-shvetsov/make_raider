@@ -20,6 +20,8 @@ class Seagull(pygame.sprite.Sprite):
         self.y_controlled_speed = 5
 
 
+
+
     def load_images(self):
         return {
             'normal': scale_img(Path('assets', 'imgs', 'seagull_fly.png'), 150),
@@ -36,15 +38,18 @@ class Seagull(pygame.sprite.Sprite):
         if not self.collided:
             self.image = self.states_imgs['bounty_collide']
             self.collided = True
-            pygame.time.set_timer(EVENTS['ACTOR_COLLISION'], 500)  # Start a timer for 0.5 seconds
+            pygame.time.set_timer(EVENTS['ACTOR_COLLISION'], 1000)  # Start a timer for 0.5 seconds
 
     def update(self, win_size):
         self.check_controls()
+
         self.speed += self.acceleration
-        if self.speed.y > 3:
-            self.switch_state('dive')
-        if self.speed.y < -3:
-            self.switch_state('normal')
+        if not self.collided:
+            if self.speed.y > 5:
+                self.switch_state('dive')
+            if self.speed.y < -3:
+                self.switch_state('normal')
+
         self.rect.move_ip(self.speed)
         self.restrict_movement(win_size)
         self.check_collision_event()

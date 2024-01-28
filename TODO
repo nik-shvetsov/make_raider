@@ -1,6 +1,6 @@
 [x] Add hotdog counter, with picture. Tie to pooping mechanics
 
-[ ] Switch enemies state on collision, don't remove enemies, add states for seagull on different collisions
+[x] Switch enemies state on collision, don't remove enemies, add states for seagull on different collisions
 
 [ ] Game ending: on collision with dog/cat
 

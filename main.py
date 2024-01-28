@@ -50,7 +50,7 @@ def update_game_state(gstate, object_threshold=8):
 
     for obj in gstate['objects']:
         if obj.rect.right < 0:
-            gstate['objects'].remove(obj) 
+            gstate['objects'].remove(obj)
 
     for shit in gstate['shits']:
         if shit.rect.y > gstate['win_size'][0]:
@@ -82,6 +82,7 @@ def check_collisions_bounty(gstate):
     )]
     for hit in hits:
         hit.collided = True
+        hit.switch_state('actor_collide')
         gstate['actor'].collide()
         
     play_bounty_sound(gstate)
