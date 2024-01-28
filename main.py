@@ -159,6 +159,7 @@ def init_start_screen(gstate, sound_path):
         exit()
 
 def show_game_over_screen(gstate):
+    game_over_sound = pygame.mixer.Sound(Path('assets','sounds','game_over.mp3'))
     game_over_img = pygame.image.load(Path('assets', 'imgs', 'game_over.png'))
     score_text = pygame.font.Font(None, 200).render(f"{gstate['score']}", True, (255, 0, 0))
     gstate['win'].blit(game_over_img, (0, -gstate['win_size'][1]/4))  # Draw the game over image
@@ -167,6 +168,8 @@ def show_game_over_screen(gstate):
         gstate['win_size'][1] * 0.35
     ))
     pygame.display.flip()  # Update the display
+
+    game_over_sound.play()
 
     while True:  # Wait for the user to close the window
         for event in pygame.event.get():
@@ -186,10 +189,18 @@ def main(gstate):
 
     ### Init sounds here ###
     fire_sound = pygame.mixer.Sound(Path('assets', 'sounds', 'fire.mp3'))
+    pygame.mixer.music.load(Path('assets', 'sounds', 'ambient.mp3'))
 
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
         gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))
+
+        # if running:
+        #     pygame.mixer.music.play(loops=-1)
+        # else:
+        #     pygame.mixer.music.stop()
+
+
 
         if gstate['game_over']:
             show_game_over_screen(gstate)
