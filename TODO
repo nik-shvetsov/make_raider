@@ -2,7 +2,7 @@
 
 [x] Switch enemies state on collision, don't remove enemies, add states for seagull on different collisions
 
-[ ] Game ending: on collision with dog/cat
+[x] Game ending: on collision with dog/cat
 
 [ ] More sounds to add: pooping sound, collision sound, cat sound, dog sound, girl sound
 

@@ -66,6 +66,8 @@ def update_game_state(gstate, object_threshold=8):
     
     for obj in gstate['objects']:
         if (obj.e_type == 'outcat' or obj.e_type == 'dog') and pygame.sprite.collide_rect(gstate['actor'], obj):
+            # TODO: remove actor 
+            obj.switch_state('actor_collide')
             gstate['game_over'] = True
 
     if gstate['actor'].rect.bottom > gstate['win_size'][1] * 1.06:

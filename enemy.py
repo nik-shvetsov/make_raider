@@ -26,7 +26,7 @@ class Enemy(pygame.sprite.Sprite):
             return {
                 'default': scale_img(Path('assets', 'imgs', 'dog_default.png'), 100),
                 'poop_collide': scale_img(Path('assets', 'imgs', 'dog_poop.png'), 100),
-                'actor_collide': scale_img(Path('assets', 'imgs', 'dog_bite.png'), 100)
+                'actor_collide': scale_img(Path('assets', 'imgs', 'dog_bite.png'), 150)
             }
         elif e_type == 'outcat':
             return {
