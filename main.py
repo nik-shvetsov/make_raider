@@ -64,6 +64,10 @@ def update_game_state(gstate, object_threshold=8):
             enemy.switch_state('poop_collide')
             gstate['shits'].remove(poop)
     
+    for obj in gstate['objects']:
+        if (obj.e_type == 'outcat' or obj.e_type == 'dog') and pygame.sprite.collide_rect(gstate['actor'], obj):
+            game_over = True
+            print (game_over)
 
 def play_bounty_sound(gstate):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
@@ -163,7 +167,8 @@ if __name__ == '__main__':
         'actor': None,
         'shits': [],
         'score': 0,
-        'hotdog_count': 0
+        'hotdog_count': 0,
+        'game_over': False
     }
 
     gstate['bg'] = Background(Path('assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)

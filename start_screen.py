@@ -6,8 +6,8 @@ class StartScreen:
     def __init__(self, window, window_size, theme_path):
         self.window = window
         self.window_size = window_size 
-        self.play_button_img = scale_img(Path('assets', 'imgs', 'play.png'), 300)
-        self.title = self.create_title()
+        self.bg_image = pygame.image.load(Path('assets', 'imgs', 'loadscreen.png'))
+        self.play_button_img = scale_img(Path('assets', 'imgs', 'start_btn.png'), d_height=100)
         # self.button_text = self.create_button_text()
         self.play_button = self.create_play_button()
         self.theme_sound = pygame.mixer.Sound(theme_path)
@@ -19,22 +19,18 @@ class StartScreen:
     def create_play_button(self):
         img_width, img_height = self.play_button_img.get_size()
         window_size = self.window_size
-        return pygame.Rect(window_size[0] / 2 - img_width / 2, window_size[1] / 2 - img_height / 2, img_width, img_height)
-    
-    def create_title(self, font_size=50):
-        title_font = pygame.font.Font(None, font_size)
-        return title_font.render('Måke raider', True, (255, 255, 255))
+        return pygame.Rect(
+            img_width * 0.05, 
+            window_size[1] - img_height * 1.05, 
+            img_width, 
+            img_height
+        )
     
     def draw(self):
         window = self.window
-        window.fill((0, 0, 0))
-        window.blit(self.title, (self.window_size[0] / 2 - self.title.get_width() / 2, self.window_size[1] / 4))
-        # pygame.draw.rect(window, (0, 255, 0), self.play_button)
+        window.blit(self.bg_image, (0, 0))  # draw the background image
         window.blit(self.play_button_img, (self.play_button.x, self.play_button.y))
-        # window.blit(self.button_text, 
-        #     (self.play_button.x + self.play_button.width / 2 - self.button_text.get_width() / 2, 
-        #     self.play_button.y + self.play_button.height / 2 - self.button_text.get_height() / 2)
-        # )
+        
 
     def run(self):
         while True:
