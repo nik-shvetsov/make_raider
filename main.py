@@ -60,7 +60,7 @@ def update_game_state(gstate, object_threshold=8):
         enemies_hit = pygame.sprite.spritecollide(poop, gstate['objects'], False)
         for enemy in enemies_hit:
             # Handle collision: add score, change state, remove poop
-            gstate['score'] += 5
+            gstate['score'] += 3
             enemy.switch_state('poop_collide')
             gstate['shits'].remove(poop)
     
