@@ -5,7 +5,6 @@ from utils import scale_img
 # Constants
 from constants import ENV_SPEED
 
-
 class Man(pygame.sprite.Sprite):
     def __init__(self, x, y, mtype=None):
         super().__init__()
@@ -18,9 +17,9 @@ class Man(pygame.sprite.Sprite):
 
     def load_images(self):
         return {
-            'man1': scale_img(Path('pics', 'dog1.png'), 100),
-            'man2': scale_img(Path('pics', 'girl1.png'), 100),
-            'man3': scale_img(Path('pics', 'cat1.png'), 100),
+            'man1': scale_img(Path('assets', 'imgs', 'dog_state1.png'), 100),
+            'man2': scale_img(Path('assets', 'imgs', 'girl_type1_w_hotdog.png'), 100),
+            'man3': scale_img(Path('assets', 'imgs', 'cat_state1.png'), 100),
         }
 
     def update(self, speed=ENV_SPEED):

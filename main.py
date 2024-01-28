@@ -7,7 +7,7 @@ from utils import scale_img
  # Constants
 from constants import EVENTS
 # Menue Screen
-from startScreen import StartScreen  
+from start_screen import StartScreen  
 # Background 
 from background import Background
 # Sprites
@@ -15,7 +15,7 @@ from seagull import Seagull
 from man import Man
 from poop import Poop
 
-def spawnHumans(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
+def spawnEnemies(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
     if random.uniform(0, 1) < 0.05:  # 5% chance per frame
         allowed_spots = Man.get_allowed_spots()
         obj_type = random.choice(list(allowed_spots.keys()))
@@ -88,10 +88,9 @@ def lookForPoop(actor, poops, event):
         poop = Poop(actor)  # Create a new instance of Poop
         poops.add(poop)  # Add the poop to the objects sprite group
 
-def startScreen():
-    sound_theme = Path('assets','sounds','theme_norway.mp3')
-    startScreen = StartScreen(win, bg.win_size, sound_theme)
-    if not startScreen.startScreen(): # Start Screen
+def init_start_screen(sound_path):
+    start_screen = StartScreen(win, win_size, sound_path)
+    if not start_screen.run(): # Start Screen
         pygame.quit()
         exit()
 
@@ -119,8 +118,8 @@ def main(bg, win):
             lookForPoop(actor, shits, event)
 
         """Update the game state"""
-        spawnHumans(humans, bg.win_size)
-        update_game_state(actor, humans, bg.win_size, shits)
+        spawnEnemies(humans, win_size)
+        update_game_state(actor, humans, win_size, shits)
         score += check_collisions(actor, humans)
 
         draw_everything(win, bg, actor, score_text, humans, shits)
@@ -130,11 +129,21 @@ def main(bg, win):
  
 if __name__ == '__main__':
     ### Setup ###
-    bg = Background(Path('assets', 'test_bg_l1.png'), Path('assets', 'test_bg_r2.png'))
-    win = pygame.display.set_mode(bg.win_size)
+    win_size = (1024, 768)
+    sound_theme = Path('assets', 'sounds', 'theme_norway.mp3')
+    bg = Background(Path('assets', 'imgs', 'bg.png'), win_size[1])
+    win = pygame.display.set_mode(win_size)
     pygame.init()
 
+    gstate = {
+        'win': win,
+        'win_size': (1024, 768),
+        'bg': bg,
+        'objects': [],
+        'actor': None,
+        'shits': [],
+    }
 
     ## Game Start ##
-    startScreen()
+    init_start_screen(sound_theme)
     main(bg, win)
