@@ -12,14 +12,14 @@ from start_screen import StartScreen
 from background import Background
 # Sprites
 from seagull import Seagull
-from man import Man
+from enemy import Enemy
 from poop import Poop
 
-def spawnEnemies(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300): # Add Man
+def spawn_enemies(objects, win_size, x_offset=100, y_position=640, spawn_chance=0.05, dist_threshold=300):
     if random.uniform(0, 1) < 0.05:  # 5% chance per frame
-        allowed_spots = Man.get_allowed_spots()
+        allowed_spots = Enemy.get_allowed_spots()
         obj_type = random.choice(list(allowed_spots.keys()))
-        spots = allowed_spots[obj_type]
+        spots = allowed_spots.get(obj_type, None)
         if spots is None:  # If the spot is None, choose a random spot
             x_spot = random.randint(win_size[0] + x_offset, win_size[0] + x_offset + win_size[0])
             y_spot = y_position
@@ -27,12 +27,12 @@ def spawnEnemies(objects, win_size, x_offset=100, y_position=640, spawn_chance=0
             spot = random.choice(spots)
             x_spot, y_spot = spot[0] + win_size[0] + x_offset, spot[1]
         
-            # Check if the new object's position would overlap with an existing object
-            for obj in objects:
-                if abs(x_spot - obj.rect.centerx) < dist_threshold:  # If the distance is less than 200
-                    return  # Don't spawn a new object
+        # Check if the new object's position would overlap with an existing object
+        for obj in objects:
+            if abs(x_spot - obj.rect.centerx) < dist_threshold:  # If the distance is less than 200
+                return  # Don't spawn a new object
 
-        obj = Man(x_spot, y_spot, obj_type)
+        obj = Enemy(x_spot, y_spot, obj_type)
         objects.add(obj)
 
 def update_game_state(actor, objects, win_size, shits, object_threshold=5):
@@ -45,12 +45,11 @@ def update_game_state(actor, objects, win_size, shits, object_threshold=5):
 
     for obj in objects:
         if obj.rect.right < 0:
-                objects.remove(obj) 
+            objects.remove(obj) 
 
     for shit in shits:
-        print(shits)  
         if shit.rect.y > win_size[0]:
-                shits.remove(shit)
+            shits.remove(shit)
 
 def play_collision_sound(actor):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
@@ -72,7 +71,7 @@ def draw_everything(win, bg, actor, score_text, objects,shits): # Render Evrthin
     win.blit(bg.left_img, (bg.left_img_pos, 0))
     win.blit(bg.right_img, (bg.right_img_pos, 0))
     win.blit(actor.image, actor.rect)
-    win.blit(score_text, (10, 100))
+    win.blit(score_text, (10, 10))
 
     """Draw all the objects"""
     for obj in objects:
@@ -106,7 +105,7 @@ def main(bg, win):
 
     font = pygame.font.Font(None, 36)
     while running:
-        score_text = font.render('Score: ' + str(score), True, (255, 255, 255))   
+        score_text = font.render('Score: ' + str(score), True, (0, 0, 255))   
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -118,7 +117,7 @@ def main(bg, win):
             lookForPoop(actor, shits, event)
 
         """Update the game state"""
-        spawnEnemies(humans, win_size)
+        spawn_enemies(humans, win_size)
         update_game_state(actor, humans, win_size, shits)
         score += check_collisions(actor, humans)
 
@@ -130,8 +129,9 @@ def main(bg, win):
 if __name__ == '__main__':
     ### Setup ###
     win_size = (1024, 768)
+    init_speed = 1
     sound_theme = Path('assets', 'sounds', 'theme_norway.mp3')
-    bg = Background(Path('assets', 'imgs', 'bg.png'), win_size[1])
+    bg = Background(Path('assets', 'imgs', 'bg.png'), win_size[1], init_speed)
     win = pygame.display.set_mode(win_size)
     pygame.init()
 

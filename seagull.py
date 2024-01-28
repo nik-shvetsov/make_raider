@@ -4,7 +4,7 @@ from pathlib import Path
 from utils import scale_img
 from poop import Poop
 
-from constants import ENV_SPEED, EVENTS
+from constants import EVENTS
 
 class Seagull(pygame.sprite.Sprite):
     def __init__(self):
@@ -16,6 +16,8 @@ class Seagull(pygame.sprite.Sprite):
         self.speed = pygame.math.Vector2(0, 0)
         self.acceleration = pygame.math.Vector2(0, 0.1)
         self.collided = False
+        self.x_controlled_speed = 2
+        self.y_controlled_speed = 5
 
 
     def load_images(self):
@@ -41,15 +43,25 @@ class Seagull(pygame.sprite.Sprite):
         self.check_collision_event()
 
     def check_controls(self): 
+        # for event in pygame.event.get():
+        #     if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+        #         self.speed.x = -self.x_controlled_speed
+        #     elif event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+        #         self.speed.x = self.x_controlled_speed
+        #     else:
+        #         self.speed.x = 0
+        #     if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+        #         self.speed.y = -self.y_controlled_speed
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
-            self.speed.x = -ENV_SPEED
+            self.speed.x = -self.x_controlled_speed
         elif keys[pygame.K_RIGHT]:
-            self.speed.x = ENV_SPEED
+            self.speed.x = self.x_controlled_speed
         else:
             self.speed.x = 0
         if keys[pygame.K_UP]:
-            self.speed.y = -5
+            self.speed.y = -self.y_controlled_speed
 
     def restrict_movement(self, win_size):
         if self.rect.bottom > win_size[1]: 
