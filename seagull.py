@@ -19,9 +19,6 @@ class Seagull(pygame.sprite.Sprite):
         self.x_controlled_speed = 2
         self.y_controlled_speed = 5
 
-
-
-
     def load_images(self):
         return {
             'normal': scale_img(Path('assets', 'imgs', 'seagull_fly.png'), 150),
@@ -76,8 +73,8 @@ class Seagull(pygame.sprite.Sprite):
             self.speed.y = -self.y_controlled_speed
 
     def restrict_movement(self, win_size):
-        if self.rect.bottom > win_size[1]: 
-            self.rect.bottom = win_size[1]
+        if self.rect.bottom > win_size[1] * 1.08: 
+            self.rect.bottom = win_size[1] * 1.07
         if self.rect.top < 0:
             self.rect.top = 0
         if self.rect.left < 0:

@@ -66,8 +66,10 @@ def update_game_state(gstate, object_threshold=8):
     
     for obj in gstate['objects']:
         if (obj.e_type == 'outcat' or obj.e_type == 'dog') and pygame.sprite.collide_rect(gstate['actor'], obj):
-            game_over = True
-            print (game_over)
+            gstate['game_over'] = True
+
+    if gstate['actor'].rect.bottom > gstate['win_size'][1] * 1.06:
+        gstate['game_over'] = True
 
 def play_bounty_sound(gstate):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
@@ -127,6 +129,22 @@ def init_start_screen(gstate, sound_path):
         pygame.quit()
         exit()
 
+def show_game_over_screen(gstate):
+    game_over_img = pygame.image.load(Path('assets', 'imgs', 'game_over.png'))
+    score_text = pygame.font.Font(None, 200).render(f"{gstate['score']}", True, (255, 0, 0))  
+    gstate['win'].blit(game_over_img, (0, 0))  # Draw the game over image
+    gstate['win'].blit(score_text, (
+        gstate['win_size'][0] * 0.7,
+        gstate['win_size'][1] * 0.6
+    ))
+    pygame.display.flip()  # Update the display
+
+    while True:  # Wait for the user to close the window
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
 def main(gstate):
     ### Game loop ###
     running = True
@@ -138,7 +156,11 @@ def main(gstate):
     # Path('assets','fonts', 'Honk', 'honk.ttf')
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
-        gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))  
+        gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))
+
+        if gstate['game_over']:
+            show_game_over_screen(gstate)
+            break
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
