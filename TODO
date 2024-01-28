@@ -1,0 +1,12 @@
+- Add hotdog counter, with picture. Tie to pooping mechanics
+
+- Switch enemies state on collision, don't remove enemies, add states for seagull on different collisions
+
+- Game ending: on collision with dog/cat
+
+- More sounds to add: pooping sound, collision sound, cat sound, dog sound, girl sound
+
+- Upload to itch.io as exe in zip
+
+If we have more time:
+- "cat with window"? set positions in advance
