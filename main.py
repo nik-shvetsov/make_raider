@@ -86,7 +86,8 @@ def draw_everything(gstate):
     gstate['win'].blit(gstate['bg'].left_img, (gstate['bg'].left_img_pos, 0))
     gstate['win'].blit(gstate['bg'].right_img, (gstate['bg'].right_img_pos, 0))
     gstate['win'].blit(gstate['actor'].image, gstate['actor'].rect)
-    gstate['win'].blit(gstate['score_text'], (10, 10))
+    gstate['win'].blit(gstate['score_img'], (10, 10))
+    gstate['win'].blit(gstate['score_text'], (gstate['score_img'].get_rect().right + 20, gstate['score_img'].get_rect().centery))
 
     """Draw all the objects"""
     for obj in gstate['objects']:
@@ -113,14 +114,14 @@ def init_start_screen(gstate, sound_path):
 def main(gstate):
     ### Game loop ###
     running = True
-    gstate['score'] = 0 
     gstate['actor'] = Seagull()
     gstate['objects'] = pygame.sprite.Group()
     gstate['shits'] = pygame.sprite.Group()
-
+    gstate['score_img'] = scale_img(Path('assets', 'imgs', 'score.png'), 100)
+    # Path('assets','fonts', 'Honk', 'honk.ttf')
     font = pygame.font.Font(None, 36)
     while running:
-        gstate['score_text'] = font.render('Score: ' + str(gstate['score']), True, (0, 0, 255))   
+        gstate['score_text'] = font.render(str(gstate['score']), True, (255,0,0))   
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -148,6 +149,7 @@ if __name__ == '__main__':
         'objects': [],
         'actor': None,
         'shits': [],
+        'score': 5
     }
 
     gstate['bg'] = Background(Path('assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)
