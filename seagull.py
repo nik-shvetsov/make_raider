@@ -22,8 +22,11 @@ class Seagull(pygame.sprite.Sprite):
 
     def load_images(self):
         return {
-            'normal': scale_img(Path('assets', 'imgs', 'seagull_state_fly.png'), 150),
-            'collide': scale_img(Path('assets', 'proto', 'seagull_quack.png'), 150),
+            'normal': scale_img(Path('assets', 'imgs', 'seagull_fly.png'), 150),
+            'dive': scale_img(Path('assets', 'imgs', 'seagull_dive.png'), 150),
+            'collide': scale_img(Path('assets', 'imgs', 'seagull_scared.png'), 150),
+            'bounty_collide': scale_img(Path('assets', 'imgs', 'seagull_w_hotdog.png'), 150),
+            'pooping': scale_img(Path('assets', 'imgs', 'seagull_poop.png'), 150),
         }
 
     def switch_state(self, state):
