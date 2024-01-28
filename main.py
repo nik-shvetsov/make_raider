@@ -50,7 +50,7 @@ def update_game_state(gstate, object_threshold=8):
 
     for obj in gstate['objects']:
         if obj.rect.right < 0:
-            gstate['objects'].remove(obj) 
+            gstate['objects'].remove(obj)
 
     for shit in gstate['shits']:
         if shit.rect.y > gstate['win_size'][0]:
@@ -60,11 +60,17 @@ def update_game_state(gstate, object_threshold=8):
         enemies_hit = pygame.sprite.spritecollide(poop, gstate['objects'], False)
         for enemy in enemies_hit:
             # Handle collision: add score, change state, remove poop
-            gstate['score'] += 5
+            gstate['score'] += 3
             play_enemy_scream(enemy)
             enemy.switch_state('poop_collide')
             gstate['shits'].remove(poop)
     
+    for obj in gstate['objects']:
+        if (obj.e_type == 'outcat' or obj.e_type == 'dog') and pygame.sprite.collide_rect(gstate['actor'], obj):
+            gstate['game_over'] = True
+
+    if gstate['actor'].rect.bottom > gstate['win_size'][1] * 1.06:
+        gstate['game_over'] = True
 
 def play_bounty_sound(gstate):
     sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
@@ -95,6 +101,7 @@ def check_collisions_bounty(gstate):
     )]
     for hit in hits:
         hit.collided = True
+        hit.switch_state('actor_collide')
         gstate['actor'].collide()
         
     play_bounty_sound(gstate)
@@ -137,6 +144,22 @@ def init_start_screen(gstate, sound_path):
         pygame.quit()
         exit()
 
+def show_game_over_screen(gstate):
+    game_over_img = pygame.image.load(Path('assets', 'imgs', 'game_over.png'))
+    score_text = pygame.font.Font(None, 200).render(f"{gstate['score']}", True, (255, 0, 0))
+    gstate['win'].blit(game_over_img, (0, 0))  # Draw the game over image
+    gstate['win'].blit(score_text, (
+        gstate['win_size'][0] * 0.7,
+        gstate['win_size'][1] * 0.6
+    ))
+    pygame.display.flip()  # Update the display
+
+    while True:  # Wait for the user to close the window
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
 def main(gstate):
     ### Game loop ###
     running = True
@@ -154,7 +177,11 @@ def main(gstate):
 
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
-        gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))  
+        gstate['hotdog_text'] = pygame.font.Font(None, 80).render(str(gstate['hotdog_count']), True, (255,0,0))
+
+        if gstate['game_over']:
+            show_game_over_screen(gstate)
+            break
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -182,7 +209,8 @@ if __name__ == '__main__':
         'actor': None,
         'shits': [],
         'score': 0,
-        'hotdog_count': 0
+        'hotdog_count': 0,
+        'game_over': False
     }
 
     gstate['bg'] = Background(Path('assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)
