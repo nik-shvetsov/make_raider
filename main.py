@@ -61,6 +61,7 @@ def update_game_state(gstate, object_threshold=8):
         for enemy in enemies_hit:
             # Handle collision: add score, change state, remove poop
             gstate['score'] += 5
+            play_enemy_scream(enemy)
             enemy.switch_state('poop_collide')
             gstate['shits'].remove(poop)
     
@@ -71,6 +72,18 @@ def play_bounty_sound(gstate):
         sound.play()
     else:
         sound.stop()
+
+def play_enemy_scream(enemy):
+    girl_sound = pygame.mixer.Sound(Path('assets','sounds', 'woman_scream.mp3'))
+    dog_sound = pygame.mixer.Sound(Path('assets','sounds', 'dog_howl_1.mp3'))
+    cat_sound = pygame.mixer.Sound(Path('assets','sounds', 'cat_scream.mp3'))
+    if enemy.e_type == 'blond_girl' or enemy.e_type == 'red_girl':
+        girl_sound.play(maxtime=450)
+    elif enemy.e_type == 'dog':
+        dog_sound.play(maxtime=450)
+    elif enemy.e_type == 'outcat':
+        cat_sound.play(maxtime=450)
+
 
 def check_collisions_bounty(gstate):
     # hits = pygame.sprite.spritecollide(gstate['actor'], gstate['objects'], True)
@@ -136,6 +149,8 @@ def main(gstate):
 
     ### Init sounds here ###
     fire_sound = pygame.mixer.Sound(Path('assets', 'sounds', 'fire.mp3'))
+    bird_hitted_sound = pygame.mixer.Sound(Path('assets','sounds', 'bird_scream.mp3'))
+    dog_sound = None
 
     while running:
         gstate['score_text'] = pygame.font.Font(None, 36).render(str(gstate['score']), True, (255,100,0))
@@ -154,7 +169,6 @@ def main(gstate):
         spawn_enemies(gstate)
         update_game_state(gstate)
         gstate['hotdog_count'] += check_collisions_bounty(gstate)
-
         draw_everything(gstate)
         gstate['bg'].update_position()
 
