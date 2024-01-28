@@ -131,7 +131,12 @@ def draw_everything(gstate):
 
     """Draw all the objects"""
     for obj in gstate['objects']:
-        gstate['win'].blit(obj.image, obj.rect)
+        if obj.e_type != 'outcat' or obj.e_type != 'dog':
+            gstate['win'].blit(obj.image, obj.rect)
+
+    for obj in gstate['objects']:
+        if obj.e_type == 'outcat' or obj.e_type == 'dog':
+            gstate['win'].blit(obj.image, obj.rect)
 
     for poop in gstate['shits']:
         gstate['win'].blit(poop.image, poop.rect)
