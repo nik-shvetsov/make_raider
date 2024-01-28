@@ -6,6 +6,17 @@ from poop import Poop
 
 from constants import EVENTS
 
+import sys
+import os
+
+# Check if we're running in a PyInstaller bundle
+if getattr(sys, 'frozen', False):
+    # If we are, set the base directory to the directory containing the .exe file
+    base_dir = sys._MEIPASS
+else:
+    # Otherwise, set it to the current directory
+    base_dir = os.path.dirname(__file__)
+
 class Seagull(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -14,10 +25,10 @@ class Seagull(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (400, 300) # init pos
         self.speed = pygame.math.Vector2(0, 0)
-        self.acceleration = pygame.math.Vector2(0, 0.015)
+        self.acceleration = pygame.math.Vector2(0, 0.1)
         self.collided = False
-        self.x_controlled_speed = 1.2
-        self.y_controlled_speed = 1.1
+        self.x_controlled_speed = 2
+        self.y_controlled_speed = 5
 
         # # Scale bbox
         # self.rect.width *= 0.5
@@ -25,11 +36,11 @@ class Seagull(pygame.sprite.Sprite):
 
     def load_images(self):
         return {
-            'normal': scale_img(Path('assets', 'imgs', 'seagull_fly.png'), 180),
-            'dive': scale_img(Path('assets', 'imgs', 'seagull_dive.png'), 180),
-            'collide': scale_img(Path('assets', 'imgs', 'seagull_scared.png'), 250),
-            'bounty_collide': scale_img(Path('assets', 'imgs', 'seagull_w_hotdog.png'), 220),
-            'pooping': scale_img(Path('assets', 'imgs', 'seagull_poop.png'), 180),
+            'normal': scale_img(Path(base_dir, 'assets', 'imgs', 'seagull_fly.png'), 180),
+            'dive': scale_img(Path(base_dir, 'assets', 'imgs', 'seagull_dive.png'), 180),
+            'collide': scale_img(Path(base_dir, 'assets', 'imgs', 'seagull_scared.png'), 250),
+            'bounty_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'seagull_w_hotdog.png'), 220),
+            'pooping': scale_img(Path(base_dir, 'assets', 'imgs', 'seagull_poop.png'), 180),
         }
 
     def switch_state(self, state):
@@ -46,9 +57,9 @@ class Seagull(pygame.sprite.Sprite):
 
         self.speed += self.acceleration
         if not self.collided:
-            if self.speed.y > 0.5:
+            if self.speed.y > 3:
                 self.switch_state('dive')
-            if self.speed.y < -0.3:
+            if self.speed.y < -3:
                 self.switch_state('normal')
 
         self.rect.move_ip(self.speed)

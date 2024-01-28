@@ -2,6 +2,17 @@ import pygame
 import random
 from pathlib import Path
 from utils import scale_img
+import sys
+import os
+
+# Check if we're running in a PyInstaller bundle
+if getattr(sys, 'frozen', False):
+    # If we are, set the base directory to the directory containing the .exe file
+    base_dir = sys._MEIPASS
+else:
+    # Otherwise, set it to the current directory
+    base_dir = os.path.dirname(__file__)
+
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y, e_type=None):
@@ -41,45 +52,45 @@ class Enemy(pygame.sprite.Sprite):
     def load_images(self, e_type):
         if e_type == 'dog': 
             return {
-                'default': scale_img(Path('assets', 'imgs', 'dog_default.png'), 140),
-                'poop_collide': scale_img(Path('assets', 'imgs', 'dog_poop.png'), 140),
-                'actor_collide': scale_img(Path('assets', 'imgs', 'dog_bite.png'), 300)
+                'default': scale_img(Path(base_dir, 'assets', 'imgs', 'dog_default.png'), 140),
+                'poop_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'dog_poop.png'), 140),
+                'actor_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'dog_bite.png'), 300)
             }
         elif e_type == 'outcat':
             return {
-                'default': scale_img(Path('assets', 'imgs', 'outcat_default.png'), 110),
-                'poop_collide': scale_img(Path('assets', 'imgs', 'outcat_angry.png'), 200),
-                'actor_collide': scale_img(Path('assets', 'imgs', 'outcat_angry.png'), 200),
+                'default': scale_img(Path(base_dir, 'assets', 'imgs', 'outcat_default.png'), 110),
+                'poop_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'outcat_angry.png'), 200),
+                'actor_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'outcat_angry.png'), 200),
             }
         elif e_type == 'blond_girl':
             return {
-                'default': scale_img(Path('assets', 'imgs', 'blondgirl_default.png'), 160),
+                'default': scale_img(Path(base_dir, 'assets', 'imgs', 'blondgirl_default.png'), 160),
                 'poop_collide': random.choice([
-                    scale_img(Path('assets', 'imgs', 'blondgirl_poop1.png'), 160),
-                    scale_img(Path('assets', 'imgs', 'blondgirl_poop2.png'), 170),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'blondgirl_poop1.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'blondgirl_poop2.png'), 170),
                 ]),
                 'actor_collide': random.choice([
-                    scale_img(Path('assets', 'imgs', 'blondgirl_angry1.png'), 160),
-                    scale_img(Path('assets', 'imgs', 'blondgirl_angry2.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'blondgirl_angry1.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'blondgirl_angry2.png'), 160),
                 ]),
             }
         elif e_type == 'red_girl':
             return {
-                'default': scale_img(Path('assets', 'imgs', 'redgirl_default.png'), 160),
+                'default': scale_img(Path(base_dir, 'assets', 'imgs', 'redgirl_default.png'), 160),
                 'poop_collide': random.choice([
-                    scale_img(Path('assets', 'imgs', 'redgirl_poop1.png'), 160),
-                    scale_img(Path('assets', 'imgs', 'redgirl_poop2.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'redgirl_poop1.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'redgirl_poop2.png'), 160),
                 ]),
                 'actor_collide': random.choice([
-                    scale_img(Path('assets', 'imgs', 'redgirl_angry1.png'), 160),
-                    scale_img(Path('assets', 'imgs', 'redgirl_angry2.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'redgirl_angry1.png'), 160),
+                    scale_img(Path(base_dir, 'assets', 'imgs', 'redgirl_angry2.png'), 160),
                 ]),
             }
         elif e_type == 'can':
             return {
-                'default': scale_img(Path('assets', 'imgs', 'can_default.png'), 100),
-                'actor_collide': scale_img(Path('assets', 'imgs', 'can_default.png'), 100),
-                'poop_collide': scale_img(Path('assets', 'imgs', 'can_default.png'), 100),
+                'default': scale_img(Path(base_dir, 'assets', 'imgs', 'can_default.png'), 100),
+                'actor_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'can_default.png'), 100),
+                'poop_collide': scale_img(Path(base_dir, 'assets', 'imgs', 'can_default.png'), 100),
             }
 
     def update(self, action='stand'):

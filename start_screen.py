@@ -2,13 +2,24 @@ import pygame
 from pathlib import Path
 from utils import scale_img
 
+import sys
+import os
+
+# Check if we're running in a PyInstaller bundle
+if getattr(sys, 'frozen', False):
+    # If we are, set the base directory to the directory containing the .exe file
+    base_dir = sys._MEIPASS
+else:
+    # Otherwise, set it to the current directory
+    base_dir = os.path.dirname(__file__)
+
 class StartScreen:
     def __init__(self, window, window_size, theme_path):
         self.window = window
         self.window_size = window_size 
-        self.bg_image = pygame.image.load(Path('assets', 'imgs', 'loadscreen.png'))
-        self.description_img = scale_img(Path('assets', 'imgs', 'desc.png'), d_height=200)
-        self.play_button_img = scale_img(Path('assets', 'imgs', 'start_btn.png'), d_height=100)
+        self.bg_image = pygame.image.load(Path(base_dir, 'assets', 'imgs', 'loadscreen.png'))
+        self.description_img = scale_img(Path(base_dir, 'assets', 'imgs', 'desc.png'), d_height=200)
+        self.play_button_img = scale_img(Path(base_dir, 'assets', 'imgs', 'start_btn.png'), d_height=100)
         self.play_button = self.create_play_button()
         self.theme_sound = pygame.mixer.Sound(theme_path)
     

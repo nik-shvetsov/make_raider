@@ -14,6 +14,16 @@ from background import Background
 from seagull import Seagull
 from enemy import Enemy
 from poop import Poop
+import sys
+import os
+
+# Check if we're running in a PyInstaller bundle
+if getattr(sys, 'frozen', False):
+    # If we are, set the base directory to the directory containing the .exe file
+    base_dir = sys._MEIPASS
+else:
+    # Otherwise, set it to the current directory
+    base_dir = os.path.dirname(__file__)
 
 def spawn_enemies(gstate, x_offset=100, y_position=640, spawn_chance=0.05, dist_range_threshold=(120, 400)):
     if random.uniform(0, 1) < spawn_chance:  # 5% chance per frame
@@ -82,16 +92,16 @@ def update_game_state(gstate, object_threshold=8):
         gstate['game_over'] = True
 
 def play_bounty_sound(gstate):
-    sound = pygame.mixer.Sound(Path('assets', 'sounds', 'hit.mp3'))
+    sound = pygame.mixer.Sound(Path(base_dir, 'assets', 'sounds', 'hit.mp3'))
     if gstate['actor'].collided:
         sound.play()
     else:
         sound.stop()
 
 def play_enemy_scream(enemy):
-    girl_sound = pygame.mixer.Sound(Path('assets','sounds', 'woman_scream.mp3'))
-    dog_sound = pygame.mixer.Sound(Path('assets','sounds', 'dog_howl_1.mp3'))
-    cat_sound = pygame.mixer.Sound(Path('assets','sounds', 'cat_scream.mp3'))
+    girl_sound = pygame.mixer.Sound(Path(base_dir, 'assets','sounds', 'woman_scream.mp3'))
+    dog_sound = pygame.mixer.Sound(Path(base_dir, 'assets','sounds', 'dog_howl_1.mp3'))
+    cat_sound = pygame.mixer.Sound(Path(base_dir, 'assets','sounds', 'cat_scream.mp3'))
     if enemy.e_type == 'blond_girl' or enemy.e_type == 'red_girl':
         girl_sound.play(maxtime=450)
     elif enemy.e_type == 'dog':
@@ -156,11 +166,11 @@ def init_start_screen(gstate, sound_path):
     start_screen = StartScreen(gstate['win'], gstate['win_size'], sound_path)
     if not start_screen.run(): # Start Screen
         pygame.quit()
-        exit()
+        sys.exit()
 
 def show_game_over_screen(gstate):
-    game_over_sound = pygame.mixer.Sound(Path('assets','sounds','game_over.mp3'))
-    game_over_img = pygame.image.load(Path('assets', 'imgs', 'game_over.png'))
+    game_over_sound = pygame.mixer.Sound(Path(base_dir, 'assets','sounds','game_over.mp3'))
+    game_over_img = pygame.image.load(Path(base_dir, 'assets', 'imgs', 'game_over.png'))
     score_text = pygame.font.Font(None, 200).render(f"{gstate['score']}", True, (255, 0, 0))
     gstate['win'].blit(game_over_img, (0, -gstate['win_size'][1]/4))  # Draw the game over image
     gstate['win'].blit(score_text, (
@@ -175,7 +185,7 @@ def show_game_over_screen(gstate):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
+                sys.exit()
 
 def main(gstate):
     ### Game loop ###
@@ -183,13 +193,13 @@ def main(gstate):
     gstate['actor'] = Seagull()
     gstate['objects'] = pygame.sprite.Group()
     gstate['shits'] = pygame.sprite.Group()
-    gstate['score_img'] = scale_img(Path('assets', 'imgs', 'score.png'), 100)
-    gstate['hotdog_img'] = scale_img(Path('assets', 'imgs', 'hotdogscore.png'), 100)
-    # Path('assets','fonts', 'Honk', 'honk.ttf')
+    gstate['score_img'] = scale_img(Path(base_dir, 'assets', 'imgs', 'score.png'), 100)
+    gstate['hotdog_img'] = scale_img(Path(base_dir, 'assets', 'imgs', 'hotdogscore.png'), 100)
+    # Path(base_dir, 'assets','fonts', 'Honk', 'honk.ttf')
 
     ### Init sounds here ###
-    fire_sound = pygame.mixer.Sound(Path('assets', 'sounds', 'fire.mp3'))
-    pygame.mixer.music.load(Path('assets', 'sounds', 'bgm_amp.mp3'))
+    fire_sound = pygame.mixer.Sound(Path(base_dir, 'assets', 'sounds', 'fire.mp3'))
+    pygame.mixer.music.load(Path(base_dir, 'assets', 'sounds', 'bgm_amp.mp3'))
 
     pygame.mixer.music.play(-1)
 
@@ -231,10 +241,10 @@ if __name__ == '__main__':
         'game_over': False
     }
 
-    gstate['bg'] = Background(Path('assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)
+    gstate['bg'] = Background(Path(base_dir, 'assets', 'imgs', 'bg.png'), gstate['win_size'][1], init_speed=1)
     gstate['win'] = pygame.display.set_mode(gstate['win_size'])
     pygame.init()
 
     ## Game Start ##
-    init_start_screen(gstate, sound_path=Path('assets', 'sounds', 'theme_norway.mp3'))
+    init_start_screen(gstate, sound_path=Path(base_dir, 'assets', 'sounds', 'theme_norway.mp3'))
     main(gstate)
